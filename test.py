@@ -11,3 +11,9 @@ def get_users():
     return {
         "users": ["John", "David", "Alex"]
     }
+
+@app.get('/games')
+def get_games():
+    return {
+        'games':['gta','sony','mee']
+    }
