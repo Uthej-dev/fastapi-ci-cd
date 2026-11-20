@@ -52,7 +52,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull reddy091/fastapi-ci-cd:latest
-            docker stop fastapi-container || true
-            docker rm fastapi-container || true
-            docker run -d --restart unless-stopped -p 8000:8000 --name fastapi-container reddy091/fastapi-ci-cd:latest
+            sudo docker pull reddy091/fastapi-ci-cd:latest
+            sudo docker stop fastapi-container || true
+            sudo docker rm fastapi-container || true
+            sudo docker run -d --restart unless-stopped -p 8000:8000 --name fastapi-container reddy091/fastapi-ci-cd:latest
+
