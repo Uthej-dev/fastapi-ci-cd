@@ -32,12 +32,27 @@ jobs:
         run: docker build -t my-fastapi-app .
 
       - name: Login to Docker Hub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
+      - name: Push Docker Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-ci-cd:latest .
+          docker tag my-fastapi-app ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-ci-cd:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-ci-cd:latest
+
+      - name: Deploy to EC2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull reddy091/fastapi-ci-cd:latest
+            docker stop fastapi-container || true
+            docker rm fastapi-container || true
+            docker run -d --restart unless-stopped -p 8000:8000 --name fastapi-container reddy091/fastapi-ci-cd:latest
