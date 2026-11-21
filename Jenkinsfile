@@ -71,7 +71,7 @@ pipeline {
                         docker tag my-fastapi-app \
                             "$DOCKER_USER/reddy091/cidcwithjenkins:latest"
 
-                        docker push "$DOCKER_USER/fastapi-ci-cd_withjenkins:latest"
+                        docker push "$DOCKER_USER/cidcwithjenkins:latest"
 
                         docker logout
                     '''
