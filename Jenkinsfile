@@ -28,6 +28,19 @@ pipeline {
                 '''
             }
         }
+        
+        stage('Install Dependencies & Run Tests') {
+            steps {
+                sh '''
+                    docker run --rm \
+                        -v jenkins_home:/jenkins-home \
+                        -w /jenkins-home/workspace/FastAPI-CI-CD \
+                        python:3.12-slim \
+                        sh -c "pip install --no-cache-dir -r Requirements.txt pytest && pytest -v"
+                '''
+            }
+        }
+
 
         stage('Python Environment') {
             steps {
