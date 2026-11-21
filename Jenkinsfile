@@ -78,6 +78,38 @@ pipeline {
                 }
             }
         }
+        
+stage('Deploy to EC2') {
+    steps {
+        withCredentials([
+            sshUserPrivateKey(
+                credentialsId: 'ec2-ssh-key',
+                keyFileVariable: 'SSH_KEY',
+                usernameVariable: 'EC2_USER'
+            )
+        ]) {
+            sh '''
+                ssh -i "$SSH_KEY" \
+                    -o StrictHostKeyChecking=no \
+                    "$EC2_USER@13.211.165.75" \
+                    '
+                    sudo docker pull reddy091/cidcwithjenkins:latest
+
+                    sudo docker stop fastapi-container || true
+
+                    sudo docker rm fastapi-container || true
+
+                    sudo docker run -d \
+                        --restart unless-stopped \
+                        -p 8000:8000 \
+                        --name fastapi-container \
+                        reddy091/cidcwithjenkins:latest
+                    '
+            '''
+        }
+    }
+}
+
 
     }
 }
