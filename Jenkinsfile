@@ -21,7 +21,7 @@ pipeline {
                     ls -la
 
                     echo "Checking required files:"
-                    ls -l main.py Requirements.txt
+                    ls -l test.py Requirements.txt
 
                     echo "Checking test files:"
                     find . -name "test_*.py" -o -name "*_test.py"
