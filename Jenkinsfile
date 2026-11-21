@@ -9,7 +9,22 @@ pipeline {
                 checkout scm
                 echo 'GitHub repository checkout successful!'
             }
+            stage('Check Workspace') {
+    steps {
+        sh '''
+            echo "Workspace location:"
+            pwd
+
+            echo "Workspace contents:"
+            ls -la
+
+            echo "Workspace environment variable:"
+            echo "$WORKSPACE"
+        '''
+    }
+}
         }
+        
 
         stage('Python Environment') {
             steps {
