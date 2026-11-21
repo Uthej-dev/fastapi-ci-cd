@@ -69,7 +69,7 @@ pipeline {
                             --password-stdin
 
                         docker tag my-fastapi-app \
-                            "$DOCKER_USER/fastapi-ci-cd:latest"
+                            "$DOCKER_USER/reddy091/cidcwithjenkins:latest"
 
                         docker push "$DOCKER_USER/fastapi-ci-cd_withjenkins:latest"
 
