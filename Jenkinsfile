@@ -44,12 +44,16 @@ pipeline {
 
         // Stage 4: Build Docker image
         stage('Build Docker Image') {
-            steps {
-                sh '''
-                    docker build -f dockerfile -t my-fastapi-app .
-                '''
-            }
-        }
+    steps {
+        sh '''
+            docker buildx build \
+                --platform linux/amd64 \
+                --load \
+                -f dockerfile \
+                -t my-fastapi-app .
+        '''
+    }
+}
 
         // Stage 5: Push image to Docker Hub
         stage('Push to Docker Hub') {
