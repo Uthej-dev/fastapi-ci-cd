@@ -40,6 +40,15 @@ pipeline {
                 '''
             }
         }
+        
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                    docker build -t my-fastapi-app-with-jenkins .
+                '''
+            }
+        }
+
 
 
         stage('Python Environment') {
