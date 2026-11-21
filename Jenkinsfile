@@ -51,7 +51,7 @@ pipeline {
             }
         }
 
-        // Stage 5: Login and push image to Docker Hub
+        // Stage 5: Push image to Docker Hub
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([
@@ -69,9 +69,9 @@ pipeline {
                             --password-stdin
 
                         docker tag my-fastapi-app \
-                            "$DOCKER_USER/reddy091/cidcwithjenkins:latest"
+                            reddy091/cidcwithjenkins:latest
 
-                        docker push "$DOCKER_USER/cidcwithjenkins:latest"
+                        docker push reddy091/cidcwithjenkins:latest
 
                         docker logout
                     '''
