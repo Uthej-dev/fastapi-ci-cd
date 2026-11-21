@@ -2,8 +2,13 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     stages {
 
+        // Stage 1: Checkout source code
         stage('Checkout') {
             steps {
                 checkout scm
@@ -11,56 +16,68 @@ pipeline {
             }
         }
 
+        // Stage 2: Verify project files
         stage('Check Workspace') {
             steps {
                 sh '''
-                    echo "Current workspace:"
+                    echo "Workspace location:"
                     pwd
 
-                    echo "Files available:"
+                    echo "Project files:"
                     ls -la
-
-                    echo "Checking required files:"
-                    ls -l test.py Requirements.txt
-
-                    echo "Checking test files:"
-                    find . -name "test_*.py" -o -name "*_test.py"
                 '''
             }
         }
-        
+
+        // Stage 3: Install dependencies and run tests
         stage('Install Dependencies & Run Tests') {
             steps {
                 sh '''
                     docker run --rm \
                         -v jenkins_home:/jenkins-home \
-                        -w /jenkins-home/workspace/FastAPI-CI-CD \
+                        -w "/jenkins-home${WORKSPACE#/var/jenkins_home}" \
                         python:3.12-slim \
                         sh -c "pip install --no-cache-dir -r Requirements.txt pytest && pytest -v"
                 '''
             }
         }
-        
+
+        // Stage 4: Build Docker image
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t my-fastapi-app-with-jenkins .
+                    docker build -f dockerfile -t my-fastapi-app .
                 '''
             }
         }
 
-
-
-        stage('Python Environment') {
+        // Stage 5: Login and push image to Docker Hub
+        stage('Push to Docker Hub') {
             steps {
-                sh 'docker run --rm python:3.12-slim python --version'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        set +x
+
+                        echo "$DOCKER_TOKEN" | docker login \
+                            --username "$DOCKER_USER" \
+                            --password-stdin
+
+                        docker tag my-fastapi-app \
+                            "$DOCKER_USER/fastapi-ci-cd:latest"
+
+                        docker push "$DOCKER_USER/fastapi-ci-cd:latest"
+
+                        docker logout
+                    '''
+                }
             }
         }
 
-        stage('Docker Verification') {
-            steps {
-                sh 'docker version'
-            }
-        }
     }
 }
