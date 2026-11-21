@@ -9,39 +9,25 @@ pipeline {
                 checkout scm
                 echo 'GitHub repository checkout successful!'
             }
-        stage('Check Workspace') {
-    steps {
-        sh '''
-            echo "Current workspace:"
-            pwd
-
-            echo "Files available:"
-            ls -la
-
-            echo "Checking required files:"
-            ls -l main.py Requirements.txt
-
-            echo "Checking test files:"
-            find . -name "test_*.py" -o -name "*_test.py"
-        '''
-    }
-}
-            stage('Check Workspace') {
-    steps {
-        sh '''
-            echo "Workspace location:"
-            pwd
-
-            echo "Workspace contents:"
-            ls -la
-
-            echo "Workspace environment variable:"
-            echo "$WORKSPACE"
-        '''
-    }
-}
         }
-        
+
+        stage('Check Workspace') {
+            steps {
+                sh '''
+                    echo "Current workspace:"
+                    pwd
+
+                    echo "Files available:"
+                    ls -la
+
+                    echo "Checking required files:"
+                    ls -l main.py Requirements.txt
+
+                    echo "Checking test files:"
+                    find . -name "test_*.py" -o -name "*_test.py"
+                '''
+            }
+        }
 
         stage('Python Environment') {
             steps {
